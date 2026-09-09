@@ -1,0 +1,10 @@
+{
+  "display_name": "PhoneOS ST",
+  "loading_order": 100,
+  "requires": [],
+  "optional": [],
+  "js": "index.js",
+  "css": "extension.css",
+  "author": "7klinnnn",
+  "version": "0.1.0"
+}
