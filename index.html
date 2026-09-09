@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhoneOS ST</title>
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+    html,body{
+        margin:0;
+        padding:0;
+        background:transparent;
+    }
+    </style>
+    </head>
+<body>
+
+<div class="phone">
+
+    <div class="screen">
+
+       <div class="status-bar">
+
+    <span class="time">22:30</span>
+
+   <div class="dynamic-island">
+    <span class="island-text">●</span>
+</div>
+   <div class="icons">
+
+    <!-- 信号 -->
+    <svg class="signal" viewBox="0 0 20 14">
+        <rect x="1" y="10" width="2" height="3" rx="1"/>
+        <rect x="5" y="8" width="2" height="5" rx="1"/>
+        <rect x="9" y="5" width="2" height="8" rx="1"/>
+        <rect x="13" y="2" width="2" height="11" rx="1"/>
+    </svg>
+
+    <!-- WiFi -->
+    <svg class="wifi" viewBox="0 0 20 14">
+        <path d="M2 5 C6 1 14 1 18 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M5 8 C8 5.5 12 5.5 15 8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <circle cx="10" cy="11.5" r="1.5" fill="currentColor"/>
+    </svg>
+
+    <!-- 电池 -->
+    <svg class="battery" viewBox="0 0 26 14">
+        <rect x="1" y="2" width="20" height="10" rx="3" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <rect x="3" y="4" width="14" height="6" rx="2" fill="currentColor"/>
+        <rect x="22" y="5" width="3" height="4" rx="1" fill="currentColor"/>
+    </svg>
+
+</div>
+</div>
+       <div class="content">
+
+    <!-- 桌面 -->
+    <div class="view active" id="home-view">
+
+       <div class="home-screen">
+
+    <!-- 左上音乐小组件 -->
+    <div class="music-widget">
+
+        <div class="music-title">♪ Echo</div>
+
+        <div class="music-controls">⏮ ▶ ⏭</div>
+
+        <div class="music-list">
+            <div>喜欢</div>
+            <div>Love Quotes</div>
+        </div>
+
+    </div>
+
+    <!-- App 九宫格 -->
+    <div class="app-grid">
+
+    <!-- 微信 -->
+    <div class="app app-wechat" id="open-wechat">
+        <div class="app-icon">
+            <img src="assets/icons/wechat.jpg" alt="微信">
+        </div>
+        <div class="app-name">微信</div>
+    </div>
+
+    <!-- 朋友圈 -->
+    <div class="app app-moments" id="open-moments">
+        <div class="app-icon">
+            <img src="assets/icons/moments.jpg" alt="朋友圈">
+        </div>
+        <div class="app-name">朋友圈</div>
+    </div>
+
+    <!-- 知乎 -->
+    <div class="app app-zhihu" id="open-zhihu">
+        <div class="app-icon">
+            <img src="assets/icons/zhihu.jpg" alt="知乎">
+        </div>
+        <div class="app-name">知乎</div>
+    </div>
+
+    <!-- 小红书 -->
+    <div class="app app-xhs" id="open-xhs">
+        <div class="app-icon">
+            <img src="assets/icons/xhs.jpg" alt="小红书">
+        </div>
+        <div class="app-name">小红书</div>
+    </div>
+
+    <!-- 淘宝 -->
+    <div class="app app-taobao" id="open-taobao">
+        <div class="app-icon">
+            <img src="assets/icons/taobao.jpg" alt="淘宝">
+        </div>
+        <div class="app-name">淘宝</div>
+    </div>
+
+    <!-- 微博 -->
+    <div class="app app-weibo" id="open-weibo">
+        <div class="app-icon">
+            <img src="assets/icons/weibo.jpg" alt="微博">
+        </div>
+        <div class="app-name">微博</div>
+    </div>
+
+    <!-- 小剧场 -->
+    <div class="app app-theater" id="open-theater">
+        <div class="app-icon">
+            <img src="assets/icons/theater.jpg" alt="小剧场">
+        </div>
+        <div class="app-name">小剧场</div>
+    </div>
+
+    <!-- 论坛 -->
+    <div class="app app-forum" id="open-forum">
+        <div class="app-icon">
+            <img src="assets/icons/forum.jpg" alt="论坛">
+        </div>
+        <div class="app-name">论坛</div>
+    </div>
+
+</div>
+    <!-- 备忘录小组件 -->
+    <div class="notes-widget">
+
+        <div class="note-title">备忘录</div>
+
+        <div class="note-line"></div>
+
+        <div class="note-line"></div>
+
+        <div class="note-line"></div>
+
+    </div>
+
+    <!-- 悬浮设置 -->
+    <button class="settings-fab" id="open-settings">⚙️</button>
+
+</div>
+
+    </div>
+
+    <!-- 微信首页 -->
+    <div class="view" id="wechat-view">
+
+        <div class="wechat">
+
+           <div class="wechat-header">
+
+               <button class="back-btn" id="nav-back">‹</button>
+
+               <span id="wechat-title">WeChat</span>
+
+            </div>
+
+            <!-- 聊天列表 -->
+<div class="chat-list-view" id="chat-list-view">
+
+    <div class="chat-list" id="chat-list">
+    </div>
+
+</div>
+
+<!-- 聊天容器（先是空的） -->
+<div class="chat-room-view" id="chat-room-view">
+
+    <div class="chat-room" id="chat-room">
+
+    
+
+    <div class="messages" id="messages"></div>
+
+</div>
+
+</div>
+
+        </div>
+
+    </div>
+    <!-- 设置页面 -->
+<div class="view" id="settings-view">
+
+    <div class="settings">
+
+        <div class="settings-header">
+
+            <button class="back-btn" id="back-settings">‹</button>
+
+            <span>Settings</span>
+
+        </div>
+
+        <div class="settings-list">
+
+            <!-- 壁纸 -->
+            <div class="setting-item" id="open-wallpaper">
+                壁纸
+            </div>
+            
+            <div class="setting-item" id="reset-wallpaper">
+                恢复默认壁纸
+            </div>
+
+            <!-- 图标风格 -->
+            <div class="setting-item">
+                图标风格
+            </div>
+
+            <!-- 主题颜色 -->
+            <div class="setting-item">
+                主题颜色
+            </div>
+
+            <!-- 头像管理 -->
+            <div class="setting-item">
+                头像管理
+            </div>
+
+        </div>
+
+        <!-- 壁纸选择器 -->
+        <input
+            type="file"
+            id="wallpaperInput"
+            accept="image/*"
+            hidden
+        >
+    </div>
+
+</div>
+
+
+</div>
+<!-- 朋友圈 -->
+<div class="view" id="moments-view">
+
+    <div class="moments-page">
+
+        <!-- 朋友圈顶部 -->
+        <div class="moments-header">
+
+            <button class="moments-back" id="moments-back">‹</button>
+
+            <span>Moments</span>
+
+        </div>
+
+        <!-- 朋友圈内容 -->
+        <div class="moments-feed" id="moments-feed">
+
+            <!-- 世界书生成的朋友圈内容放这里 -->
+
+        </div>
+
+    </div>
+
+</div>
+<!-- 微博 -->
+<div class="view" id="weibo-view">
+    <div class="app-page">
+        <div class="page-header">
+            <button class="back-btn" data-back="home">‹</button>
+            <span>Weibo</span>
+        </div>
+
+        <div class="page-body" id="weibo-feed"></div>
+    </div>
+</div>
+
+<!-- 小红书 -->
+<div class="view" id="xhs-view">
+    <div class="app-page">
+        <div class="page-header">
+            <button class="back-btn" data-back="home">‹</button>
+            <span>RED</span>
+        </div>
+
+        <div class="page-body" id="xhs-feed"></div>
+    </div>
+</div>
+
+<!-- 淘宝 -->
+<div class="view" id="taobao-view">
+    <div class="app-page">
+        <div class="page-header">
+            <button class="back-btn" data-back="home">‹</button>
+            <span>Taobao</span>
+        </div>
+
+        <div class="page-body" id="taobao-orders"></div>
+    </div>
+</div>
+
+<!-- 知乎 -->
+<div class="view" id="zhihu-view">
+    <div class="app-page">
+        <div class="page-header">
+            <button class="back-btn" data-back="home">‹</button>
+            <span>Zhihu</span>
+        </div>
+
+        <div class="page-body" id="zhihu-feed"></div>
+    </div>
+</div>
+
+<!-- 论坛 -->
+<div class="view" id="forum-view">
+
+    <div class="app-page">
+
+        <div class="page-header">
+
+            <button class="back-btn" data-back="home">‹</button>
+
+            <span>Forum</span>
+
+        </div>
+
+        <div class="page-body" id="forum-feed">
+            <!-- 世界书生成论坛内容 -->
+        </div>
+
+    </div>
+
+</div>
+
+<!-- 小剧场 -->
+<div class="view" id="theater-view">
+    <div class="app-page">
+        <div class="page-header">
+            <button class="back-btn" data-back="home">‹</button>
+            <span>Theater</span>
+        </div>
+
+        <div class="page-body" id="theater-feed"></div>
+    </div>
+</div>
+    <div class="home-indicator"></div>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
