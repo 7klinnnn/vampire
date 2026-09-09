@@ -1,0 +1,54 @@
+/* PhoneOS Floating Panel */
+
+#phoneos-toggle{
+    position:fixed;
+    right:18px;
+    bottom:18px;
+    width:54px;
+    height:54px;
+    border-radius:50%;
+    border:none;
+    background:#ffffff;
+    box-shadow:0 8px 24px rgba(0,0,0,.18);
+    cursor:pointer;
+    z-index:10001;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:.25s;
+}
+
+#phoneos-toggle:hover{
+    transform:scale(1.08);
+}
+
+#phoneos-panel{
+    position:fixed;
+    right:18px;
+    bottom:84px;
+    width:330px;
+    height:640px;
+    z-index:10000;
+
+    /* 重点：去掉外面那块色块 */
+    background:transparent;
+    box-shadow:none;
+    padding:0;
+
+    opacity:1;
+    transform:translateY(0);
+    transition:.25s ease;
+}
+
+#phoneos-panel.hidden{
+    opacity:0;
+    transform:translateY(20px);
+    pointer-events:none;
+}
+
+#phoneos-panel iframe{
+    width:100%;
+    height:100%;
+    border:none;
+    background:transparent;
+}
