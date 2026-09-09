@@ -1,0 +1,1274 @@
+// ========================================
+// PhoneOS ST
+// Version : v3.0
+// Module  : Runtime + Navigation + Apps
+// ========================================
+
+
+// ========================================
+// P-03 Dynamic Island
+// ========================================
+
+function showIsland(text = "收到新消息") {
+
+    const island = document.querySelector(".dynamic-island");
+    const islandText = document.querySelector(".island-text");
+
+    if (!island || !islandText) return;
+
+    islandText.textContent = text;
+
+    island.classList.add("expand");
+
+    setTimeout(() => {
+
+        islandText.textContent = "●";
+        island.classList.remove("expand");
+
+    }, 2000);
+
+}
+
+
+// ========================================
+// P-05 Avatar Manager
+// ========================================
+
+const avatar = document.getElementById("avatar");
+const avatarInput = document.getElementById("avatarInput");
+
+if (avatar && avatarInput) {
+
+    avatar.addEventListener("click", () => {
+        avatarInput.click();
+    });
+
+    avatarInput.addEventListener("change", (event) => {
+
+        const file = event.target.files?.[0];
+
+        if (!file) return;
+
+        const url = URL.createObjectURL(file);
+
+        document.querySelectorAll(".avatar").forEach(item => {
+            item.style.backgroundImage = `url("${url}")`;
+        });
+
+        document.querySelectorAll(".cover-avatar").forEach(item => {
+            item.style.backgroundImage = `url("${url}")`;
+        });
+
+        document.querySelectorAll(".moment-avatar").forEach(item => {
+            item.style.backgroundImage = `url("${url}")`;
+        });
+
+    });
+
+}
+
+
+// ========================================
+// SYS-01 Navigation
+// ========================================
+
+const homeView = document.getElementById("home-view");
+
+let currentViewId = "home-view";
+
+function showView(viewId) {
+
+    if (!viewId) return;
+
+    const target = document.getElementById(viewId);
+
+    if (!target) {
+        console.warn(`[PhoneOS] 页面不存在: ${viewId}`);
+        return;
+    }
+
+    document.querySelectorAll(".view").forEach(view => {
+        view.classList.remove("active");
+    });
+
+    target.classList.add("active");
+
+    currentViewId = viewId;
+
+}
+
+
+function goHome() {
+
+    if (!homeView) return;
+
+    document.querySelectorAll(".view").forEach(view => {
+        view.classList.remove("active");
+    });
+
+    homeView.classList.add("active");
+
+    currentViewId = "home-view";
+
+}
+
+
+// ========================================
+// SYS-02 App Navigation
+// ========================================
+
+const appMap = {
+
+    "open-weibo": "weibo-view",
+    "open-xhs": "xhs-view",
+    "open-taobao": "taobao-view",
+    "open-zhihu": "zhihu-view",
+    "open-theater": "theater-view",
+
+    // 这两个页面现在可以没有，
+    // 等 index.html 建好后会自动接通
+    "open-moments": "moments-view",
+    "open-forum": "forum-view"
+
+};
+
+
+Object.entries(appMap).forEach(([buttonId, viewId]) => {
+
+    const button = document.getElementById(buttonId);
+
+    if (!button) return;
+
+    button.addEventListener("click", () => {
+
+        showView(viewId);
+
+        // 每次打开独立 App，
+        // 默认回到自己的首页状态
+        resetAppState(viewId);
+
+    });
+
+});
+
+
+// 设置
+
+const openSettings = document.getElementById("open-settings");
+const settingsView = document.getElementById("settings-view");
+
+if (openSettings && settingsView) {
+
+    openSettings.addEventListener("click", () => {
+        showView("settings-view");
+    });
+
+}
+
+
+// ========================================
+// SYS-03 通用返回按钮
+// ========================================
+
+document.querySelectorAll('[data-back="home"]').forEach(button => {
+
+    button.addEventListener("click", () => {
+        goHome();
+    });
+
+});
+
+
+// ========================================
+// W-01 WeChat Navigation
+// 桌面 → 微信列表 → 聊天
+// ========================================
+
+const wechatView = document.getElementById("wechat-view");
+
+const openWechat = document.getElementById("open-wechat");
+
+const chatListView = document.getElementById("chat-list-view");
+const chatRoomView = document.getElementById("chat-room-view");
+
+const navBack = document.getElementById("nav-back");
+const wechatTitle = document.getElementById("wechat-title");
+
+let wechatPage = "list";
+
+
+if (openWechat) {
+
+    openWechat.addEventListener("click", () => {
+
+        showView("wechat-view");
+
+        wechatPage = "list";
+
+        if (chatListView) {
+            chatListView.style.display = "block";
+        }
+
+        if (chatRoomView) {
+            chatRoomView.style.display = "none";
+        }
+
+        if (wechatTitle) {
+            wechatTitle.textContent = "WeChat";
+        }
+
+        if (navBack) {
+            navBack.style.display = "block";
+        }
+
+    });
+
+}
+
+
+if (navBack) {
+
+    navBack.addEventListener("click", () => {
+
+        if (wechatPage === "chat") {
+
+            // 聊天 → 微信列表
+
+            wechatPage = "list";
+
+            if (chatRoomView) {
+                chatRoomView.style.display = "none";
+            }
+
+            if (chatListView) {
+                chatListView.style.display = "block";
+            }
+
+            if (wechatTitle) {
+                wechatTitle.textContent = "WeChat";
+            }
+
+        } else {
+
+            // 微信列表 → 桌面
+
+            goHome();
+
+            navBack.style.display = "none";
+
+        }
+
+    });
+
+}
+
+
+// ========================================
+// P-04 Settings
+// ========================================
+
+const backSettings = document.getElementById("back-settings");
+
+if (backSettings) {
+
+    backSettings.addEventListener("click", () => {
+        goHome();
+    });
+
+}
+
+
+// ========================================
+// SYS-04 App State
+// ========================================
+
+function resetAppState(viewId) {
+
+    // 这里以后负责：
+    // 微博首页 / 详情
+    // 小红书首页 / 详情
+    // 论坛首页 / 帖子
+    // 等等
+
+    if (viewId === "moments-view") {
+
+        const list = document.getElementById("moments-list-view");
+        const detail = document.getElementById("moments-detail-view");
+
+        if (list) list.style.display = "block";
+        if (detail) detail.style.display = "none";
+
+    }
+
+}
+
+
+// ========================================
+// SYS-05 PhoneOS UI Parser
+//
+// 世界书输出：
+//
+// [phone_ui]
+// ...HTML...
+// [/phone_ui]
+//
+// PhoneOS 负责读取，不负责生成。
+// ========================================
+
+const PhoneRuntime = {
+
+    latestHTML: "",
+
+    parse(text) {
+
+        if (typeof text !== "string") {
+            return null;
+        }
+
+        const match = text.match(
+            /\[phone_ui\]([\s\S]*?)\[\/phone_ui\]/i
+        );
+
+        if (!match) {
+            return null;
+        }
+
+        this.latestHTML = match[1].trim();
+
+        return this.latestHTML;
+
+    },
+
+    toDOM(html) {
+
+        if (!html) return null;
+
+        const parser = new DOMParser();
+
+        const doc = parser.parseFromString(
+            `<div id="phone-runtime-root">${html}</div>`,
+            "text/html"
+        );
+
+        return doc.getElementById("phone-runtime-root");
+
+    }
+
+};
+
+
+// ========================================
+// SYS-06 Helpers
+// ========================================
+
+function replaceHTML(target, sourceNode) {
+
+    if (!target || !sourceNode) return;
+
+    target.innerHTML = sourceNode.innerHTML;
+
+}
+
+
+function renderHTMLList(target, nodes) {
+
+    if (!target) return;
+
+    target.innerHTML = "";
+
+    nodes.forEach(node => {
+
+        target.appendChild(
+            node.cloneNode(true)
+        );
+
+    });
+
+}
+
+
+function findFirst(root, selector) {
+
+    if (!root) return null;
+
+    return root.querySelector(selector);
+
+}
+
+
+function findAll(root, selector) {
+
+    if (!root) return [];
+
+    return Array.from(
+        root.querySelectorAll(selector)
+    );
+
+}
+
+
+// ========================================
+// W-04 WeChat Native Renderer
+// ========================================
+
+function renderWeChat(source) {
+
+    const target = document.getElementById("messages");
+
+    if (!target || !source) return;
+
+    const contact =
+        source.querySelector(".wechat-contact");
+
+    const rows =
+        [...source.querySelectorAll(".message-row")];
+
+    let html = "";
+
+    if (contact) {
+
+        html += `
+        <div class="wechat-contact">
+            ${contact.innerHTML}
+        </div>`;
+
+    }
+
+    rows.forEach(row => {
+
+        const side =
+            row.classList.contains("right")
+            ? "right"
+            : "left";
+
+        const bubble =
+            row.querySelector(".message-bubble");
+
+        if (!bubble) return;
+
+        html += `
+        <div class="message-row ${side}">
+            <div class="message-bubble">
+                ${bubble.innerHTML}
+            </div>
+        </div>`;
+
+    });
+
+    target.innerHTML = html;
+
+    target.scrollTop = target.scrollHeight;
+
+}
+// ========================================
+// W-06 WeChat Multi Chat List
+// ========================================
+
+function renderChatList(source){
+
+    const chatList = document.getElementById("chat-list");
+    const messages = document.getElementById("messages");
+
+    if(!chatList || !messages || !source) return;
+
+    // ===== 兼容未来多联系人 =====
+    let threads = [...source.querySelectorAll(".wechat-thread")];
+
+    // 如果世界书还是旧格式（只有一个联系人）
+    if(threads.length === 0){
+
+        const contactText =
+            source.querySelector(".wechat-contact")?.textContent || "";
+
+        const contact =
+            contactText.split("|").pop().replace("联系人：","").trim() || "未知联系人";
+
+        const time =
+            contactText.match(/时间：(.+?)\s*\|/)?.[1] || "";
+
+        const rows = [...source.querySelectorAll(".message-row")];
+
+        threads = [{
+            contact,
+            time,
+            rows
+        }];
+
+    }else{
+
+        threads = threads.map(thread=>{
+
+            const contactText =
+                thread.querySelector(".wechat-contact")?.textContent || "";
+
+            return{
+                contact:
+                    contactText.split("|").pop().replace("联系人：","").trim() || "未知联系人",
+
+                time:
+                    contactText.match(/时间：(.+?)\s*\|/)?.[1] || "",
+
+                rows:
+                    [...thread.querySelectorAll(".message-row")]
+            };
+
+        });
+
+    }
+
+    // 最新聊天排前面
+    threads.reverse();
+
+    chatList.innerHTML="";
+
+    threads.forEach((thread,index)=>{
+
+        const preview =
+            thread.rows.length
+                ? thread.rows[thread.rows.length-1]
+                    .querySelector(".message-bubble")
+                    ?.textContent || ""
+                : "暂无消息";
+
+        const unread =
+            Math.min(thread.rows.length,99);
+
+        const item=document.createElement("div");
+
+        item.className="chat-item";
+
+        item.innerHTML=`
+            <div class="avatar">${thread.contact[0] || "?"}</div>
+
+            <div class="chat-info">
+
+                <div class="name">${thread.contact}</div>
+
+                <div class="preview">${preview}</div>
+
+            </div>
+
+            <div class="chat-right">
+
+                <div class="time-small">${thread.time}</div>
+
+                ${
+                    unread>1
+                    ? `<div class="unread-badge">${unread}</div>`
+                    : ""
+                }
+
+            </div>
+        `;
+
+        item.addEventListener("click",()=>{
+
+            wechatPage="chat";
+
+            chatListView.style.display="none";
+            chatRoomView.style.display="block";
+
+            wechatTitle.textContent=thread.contact;
+
+            let html=`<div class="wechat-contact">联系人：${thread.contact}</div>`;
+
+            thread.rows.forEach(row=>{
+
+                const side=row.classList.contains("right")?"right":"left";
+
+                html+=`
+                    <div class="message-row ${side}">
+                        <div class="message-bubble">
+                            ${row.querySelector(".message-bubble")?.innerHTML || ""}
+                        </div>
+                    </div>`;
+            });
+
+            messages.innerHTML=html;
+            messages.scrollTop=messages.scrollHeight;
+
+        });
+
+        chatList.appendChild(item);
+
+    });
+
+}
+
+// ========================================
+// M-01 Moments Renderer
+// ========================================
+
+function renderMoments(source) {
+
+    const target = document.getElementById("moments-feed");
+
+    if (!target || !source) return;
+
+    target.innerHTML = source.innerHTML;
+
+}
+
+
+// ========================================
+// ZH-01 Zhihu Renderer
+// ========================================
+
+function renderZhihu(source) {
+
+    const target = document.getElementById("zhihu-feed");
+
+    if (!target || !source) return;
+
+    target.innerHTML = source.innerHTML;
+
+}
+
+
+// ========================================
+// XHS-01 Xiaohongshu Renderer
+// ========================================
+
+function renderXHS(source) {
+
+    const target = document.getElementById("xhs-feed");
+
+    if (!target || !source) return;
+
+    target.innerHTML = source.innerHTML;
+
+}
+
+
+// ========================================
+// WB-01 Weibo Renderer
+// ========================================
+
+function renderWeibo(source) {
+
+    const target = document.getElementById("weibo-feed");
+
+    if (!target || !source) return;
+
+    target.innerHTML = source.innerHTML;
+
+}
+
+
+// ========================================
+// F-01 Forum Renderer
+// ========================================
+
+function renderForum(source) {
+
+    const target = document.getElementById("forum-feed");
+
+    if (!target || !source) return;
+
+    target.innerHTML = source.innerHTML;
+
+}
+
+
+// ========================================
+// MEMO-01 Memo Renderer
+// ========================================
+
+function renderMemo(source) {
+
+    const target = document.querySelector(".notes-widget");
+
+    if (!target || !source) return;
+
+    target.innerHTML = source.innerHTML;
+
+}
+
+
+// ========================================
+// THEATER-01 Theater Renderer
+// ========================================
+
+function renderTheater(source) {
+
+    const target = document.getElementById("theater-feed");
+
+    if (!target || !source) return;
+
+    target.innerHTML = source.innerHTML;
+
+}
+
+
+// ========================================
+// SYS-07 Extract 8 App Modules
+// Version : v3.2
+// Module  : Stable Module Detection
+// ========================================
+
+function extractPhoneModules(root) {
+
+    if (!root) return null;
+
+
+    // ----------------------------------------
+    // 优先使用 data-app 标记
+    // ----------------------------------------
+
+    const findByAppName = (name) => {
+
+        return root.querySelector(
+            `[data-app="${name}"]`
+        ) || null;
+
+    };
+
+
+    // ----------------------------------------
+    // 收集卡片
+    // ----------------------------------------
+
+    const appCards =
+        Array.from(
+            root.querySelectorAll(".app-card")
+        );
+
+    const postCards =
+        Array.from(
+            root.querySelectorAll(".post-card")
+        );
+
+
+    // ----------------------------------------
+    // 模块对象
+    // ----------------------------------------
+
+    const modules = {
+
+        // ① 微信
+        wechat:
+            findByAppName("wechat")
+            || appCards.find(card =>
+                card.dataset.app === "wechat"
+            )
+            || appCards[0]
+            || null,
+
+
+        // ② 朋友圈
+        moments:
+            findByAppName("moments")
+            || appCards.find(card =>
+                card.dataset.app === "moments"
+            )
+            || appCards[1]
+            || null,
+
+
+        // ③ 知乎
+        zhihu:
+            findByAppName("zhihu")
+            || root.querySelector(
+                ".post-card.zhihu"
+            )
+            || null,
+
+
+        // ④ 小红书
+        xhs:
+            findByAppName("xhs")
+            || root.querySelector(
+                ".post-card.xhs"
+            )
+            || null,
+
+
+        // ⑤ 微博
+        weibo:
+            findByAppName("weibo")
+            || root.querySelector(
+                ".post-card.weibo"
+            )
+            || null,
+
+
+        // ⑥ 论坛
+        forum:
+            findByAppName("forum")
+            || root.querySelector(
+                ".post-card.forum"
+            )
+            || null,
+
+
+        // ⑦ 备忘录
+        memo:
+            findByAppName("memo")
+            || root.querySelector(
+                ".note-card"
+            )
+            || null,
+
+
+        // ⑧ 小剧场
+        theater:
+            findByAppName("theater")
+            || root.querySelector(
+                ".notebook-card"
+            )
+            || null
+
+    };
+
+
+    // ----------------------------------------
+    // 论坛兼容模式
+    // ----------------------------------------
+
+    if (!modules.forum) {
+
+        modules.forum =
+            postCards.find(card => {
+
+                if (
+                    card.classList.contains("zhihu") ||
+                    card.classList.contains("xhs") ||
+                    card.classList.contains("weibo")
+                ) {
+                    return false;
+                }
+
+                return true;
+
+            }) || null;
+
+    }
+
+
+    // ----------------------------------------
+    // 最终检查
+    // ----------------------------------------
+
+    return modules;
+
+}
+
+
+// ========================================
+// RUNTIME-01 Main Update
+// ========================================
+
+const PhoneOS = {
+
+    version: "3.0",
+
+    data: null,
+
+    raw: "",
+
+    update(text) {
+
+        const html = PhoneRuntime.parse(text);
+
+        if (!html) {
+
+            console.warn(
+                "[PhoneOS] 没有找到 [phone_ui] 数据"
+            );
+
+            return false;
+
+        }
+
+        const root = PhoneRuntime.toDOM(html);
+
+        if (!root) {
+
+            console.warn(
+                "[PhoneOS] phone_ui HTML 解析失败"
+            );
+
+            return false;
+
+        }
+
+        const modules =
+            extractPhoneModules(root);
+
+        if (!modules) return false;
+
+        this.raw = html;
+
+        this.data = modules;
+
+        // ① 微信
+        renderWeChat(
+            modules.wechat
+        );
+
+        renderChatList(
+            modules.wechat
+        );
+
+        // ② 朋友圈
+        renderMoments(
+            modules.moments
+        );
+
+        // ③ 知乎
+        renderZhihu(
+            modules.zhihu
+        );
+
+        // ④ 小红书
+        renderXHS(
+            modules.xhs
+        );
+
+        // ⑤ 微博
+        renderWeibo(
+            modules.weibo
+        );
+
+        // ⑥ 论坛
+        renderForum(
+            modules.forum
+        );
+
+        // ⑦ 备忘录
+        renderMemo(
+            modules.memo
+        );
+
+        // ⑧ 小剧场
+        renderTheater(
+            modules.theater
+        );
+
+        return true;
+
+    },
+
+
+    // ====================================
+    // 手动加载
+    // 以后如果酒馆插件拿到字符串，
+    // 直接调用这个
+    // ====================================
+
+    load(text) {
+
+        return this.update(text);
+
+    }
+
+};
+
+
+// ========================================
+// SYS-08 Compatibility API
+//
+// 以后外部只需要：
+//
+// PhoneOS.update(text)
+//
+// 或：
+//
+// PhoneOS.load(text)
+// ========================================
+
+window.PhoneOS = PhoneOS;
+window.PhoneRuntime = PhoneRuntime;
+
+
+// ========================================
+// Debug
+// ========================================
+
+console.log(
+    `[PhoneOS] Runtime v${PhoneOS.version} loaded`
+);
+
+// ========================================
+// M-02 Moments Navigation
+// Version : v3.0.2
+// ========================================
+
+const momentsBack = document.getElementById("moments-back");
+
+if (momentsBack) {
+
+    momentsBack.addEventListener("click", () => {
+
+        goHome();
+
+    });
+
+}
+// ========================================
+// P-04-01 Wallpaper Manager
+// Version : v3.1
+// ========================================
+
+const wallpaperButton =
+    document.getElementById("open-wallpaper");
+
+const wallpaperInput =
+    document.getElementById("wallpaperInput");
+
+
+// ----------------------------------------
+// 应用壁纸
+// ----------------------------------------
+
+function applyWallpaper(dataUrl) {
+
+    if (!dataUrl) return;
+
+    const homeScreen =
+        document.querySelector(".home-screen");
+
+    if (!homeScreen) return;
+
+    homeScreen.style.backgroundImage =
+        `url("${dataUrl}")`;
+}
+
+
+// ----------------------------------------
+// 读取已经保存的壁纸
+// ----------------------------------------
+
+function loadSavedWallpaper() {
+
+    try {
+
+        const savedWallpaper =
+            localStorage.getItem("phoneos_wallpaper");
+
+        if (savedWallpaper) {
+
+            applyWallpaper(savedWallpaper);
+
+        }
+
+    } catch (error) {
+
+        console.warn(
+            "[PhoneOS] 无法读取已保存的壁纸",
+            error
+        );
+
+    }
+}
+
+
+// ----------------------------------------
+// 打开文件选择器
+// ----------------------------------------
+
+if (wallpaperButton && wallpaperInput) {
+
+    wallpaperButton.addEventListener("click", () => {
+
+        wallpaperInput.click();
+
+    });
+
+
+    wallpaperInput.addEventListener("change", (event) => {
+
+        const file =
+            event.target.files?.[0];
+
+        if (!file) return;
+
+        if (!file.type.startsWith("image/")) {
+
+            return;
+
+        }
+
+        const reader =
+            new FileReader();
+
+
+        reader.onload = () => {
+
+            const dataUrl =
+                reader.result;
+
+            applyWallpaper(dataUrl);
+
+
+            try {
+
+                localStorage.setItem(
+                    "phoneos_wallpaper",
+                    dataUrl
+                );
+
+            } catch (error) {
+
+                console.warn(
+                    "[PhoneOS] 壁纸保存失败",
+                    error
+                );
+
+            }
+
+        };
+
+
+        reader.readAsDataURL(file);
+
+    });
+
+}
+
+
+// ----------------------------------------
+// 启动时恢复壁纸
+// ----------------------------------------
+
+loadSavedWallpaper();
+
+// ========================================
+// P-07-01 PhoneOS Auto Sync
+// Version : v3.3
+// Module  : Auto Listener
+// ========================================
+
+let lastPhoneUI = "";
+
+
+// ----------------------------------------
+// 提取最后一个 phone_ui
+// ----------------------------------------
+
+function extractLatestPhoneUI(text){
+
+    if(!text) return null;
+
+    const matches =
+        [...text.matchAll(/\[phone_ui\]([\s\S]*?)\[\/phone_ui\]/g)];
+
+    if(matches.length === 0){
+        return null;
+    }
+
+    return matches[matches.length-1][1].trim();
+
+}
+
+
+// ----------------------------------------
+// 从聊天页面读取
+// ----------------------------------------
+
+function readLatestAssistantMessage(){
+
+    const candidates = [
+
+        ".mes:last-child .mes_text",
+        ".mes:last-child .message_text",
+        ".mes:last-child .message-body",
+        ".mes:last-child"
+
+    ];
+
+    for(const selector of candidates){
+
+        const node =
+            document.querySelector(selector);
+
+        if(node?.innerHTML){
+
+            return node.innerHTML;
+
+        }
+
+        if(node?.textContent){
+
+            return node.textContent;
+
+        }
+
+    }
+
+    return "";
+
+}
+
+
+// ----------------------------------------
+// 更新 PhoneOS
+// ----------------------------------------
+
+function autoRefreshPhone(){
+
+    const message =
+        readLatestAssistantMessage();
+
+    const phoneUI =
+        extractLatestPhoneUI(message);
+
+    if(!phoneUI) return;
+
+    if(phoneUI === lastPhoneUI) return;
+
+    lastPhoneUI = phoneUI;
+
+    PhoneOS.update(phoneUI);
+
+}
+
+
+// ----------------------------------------
+// MutationObserver
+// ----------------------------------------
+
+function startPhoneObserver(){
+
+    const chat =
+        document.querySelector("#chat")
+        || document.querySelector("#chat_container")
+        || document.querySelector(".chat")
+        || document.body;
+
+    const observer =
+        new MutationObserver(() => {
+
+            requestAnimationFrame(autoRefreshPhone);
+
+        });
+
+    observer.observe(chat,{
+        childList:true,
+        subtree:true,
+        characterData:true
+    });
+
+    autoRefreshPhone();
+
+    console.log("[PhoneOS] Auto Sync Ready");
+
+}
+
+
+// ----------------------------------------
+// 启动
+// ----------------------------------------
+
+if(document.readyState === "loading"){
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        startPhoneObserver
+    );
+
+}else{
+
+    startPhoneObserver();
+
+}
